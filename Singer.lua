@@ -25,7 +25,7 @@ default = {
     troubadour=true,
     debuffing=false,
 	nitro=true,
-    recast={song={min=80,max=100},buff={min=5,max=10}},
+    recast={song={min=20,max=45},buff={min=5,max=10}},
     active=false,
     timers=true,
     aoe={['party']=true, ['p1'] = true,['p2'] = true,['p3'] = true,['p4'] = true,['p5'] = true},
