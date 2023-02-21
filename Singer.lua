@@ -841,6 +841,9 @@ end)
 
 
 function job_list(job_selection)
+	if job_selection:lower() == 'tank' then
+		return true
+	end
 	for _,jobs in pairs(res.jobs) do
 		if type(jobs)=='table' and job_selection:lower() == jobs.ens:lower() then
 			return true
