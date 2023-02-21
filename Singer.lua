@@ -9,6 +9,7 @@ packets = require('packets')
 texts = require('texts')
 config = require('config')
 
+res = require('resources')
 get = require('sing_get')
 cast = require('sing_cast')
 song_timers = require('song_timers')
@@ -91,6 +92,27 @@ setting = T{
 }
 
 local save_file
+job_registry = T{}
+
+function set_registry(id, job_id)
+    if not id then return false end
+    job_registry[id] = job_registry[id] or 'NON'
+    job_id = job_id or 0
+    if res.jobs[job_id].ens == 'NON' and job_registry[id] and not S{'NON', 'UNK'}:contains(job_registry[id]) then 
+        return false
+    end
+    job_registry[id] = res.jobs[job_id].ens
+    return true
+end
+
+-- Credit to partyhints
+function get_registry(id)
+    if job_registry[id] then
+		return job_registry[id]
+    else
+        return 'UNK'
+    end
+end
 
 do
     local file_path = windower.addon_path..'data/settings.lua'
@@ -321,111 +343,18 @@ function do_stuff()
     end
 end
 
-do_stuff:loop(settings.interval)
+function Engine()
+	do_stuff()
+	coroutine.schedule(Engine,settings.interval)
+end
+
+--do_stuff:loop(settings.interval)
+
 
 start_categories = S{8,9}
 finish_categories = S{3,5}
 buff_lost_messages = S{64,204,206,350,531}
 death_messages = {[6]=true,[20]=true,[113]=true,[406]=true,[605]=true,[646]=true}
-
--- windower.register_event('incoming chunk', function(id,data,modified,injected,blocked)
-    -- if injected then
-    -- elseif id == 0x028 then
-        -- local act = windower.packets.parse_action(data)
-
-        -- if act.actor_id ~= get.player_id then return false end
-
-        -- if act.category == 4 then
-            -- -- Finish Casting
-            -- del = settings.delay
-            -- local spell = get.spell_by_id(act.param)
-
-            -- if spell then
-                -- local targ = windower.ffxi.get_mob_by_id(act.targets[1].id)
-
-                -- if targ then
-                    -- timers.buffs[spell.enl] = timers.buffs[spell.enl] or {}
-                    -- timers.buffs[spell.enl][targ.name] = os.time() + spell.dur
-                -- end
-                -- return
-            -- end
-
-            -- local song = get.song_name(act.param)
-
-            -- if not song then return end
-
-            -- local effect = act.targets[1].actions[1].param
-
-            -- if song_buffs[effect] and not buffs.pianissimo and (not settings.aoe.party or get.aoe_range()) then
-                -- song_timers.adjust(song, 'AoE', buffs)
-            -- end
-
-            -- for _, target in ipairs(act.targets) do
-                -- effect = target.actions[1].param
-
-                -- if song_buffs[effect] then
-                    -- song_timers.adjust(song, windower.ffxi.get_mob_by_id(target.id).name, buffs)
-                -- elseif song_debuffs[effect] then
-                    -- effect = song_debuffs[effect]
-                    -- debuffed[target.id] = debuffed[target.id] or {}
-                    -- debuffed[target.id][effect] = true
-                -- end
-            -- end
-
-        -- elseif act.category == 7 then
-            -- del = 2.2
-        -- elseif finish_categories:contains(act.category) then
-            -- del = 2.2
-        -- elseif start_categories:contains(act.category) then
-            -- if (act.param == 24931) then
-            -- -- Begin Casting
-                -- del = 4.2
-            -- else
-            -- -- Failed Casting
-                -- del = 2.2
-            -- end
-        -- end
-
-    -- elseif id == 0x029 then
-        -- local actor = data:unpack('I', 0x04+1)
-        -- local target = data:unpack('I',0x08+1)
-        -- local param = data:unpack('I',0x0C+1)
-        -- local message = data:unpack('H',0x18+1) % 0x8000
-
-        -- if death_messages[message] then
-            -- debuffed[target] = nil
-        -- elseif actor == get.player_id and buff_lost_messages:contains(message)  then
-            -- song_timers.buff_lost(target, param) 
-        -- end
-
-    -- elseif id == 0x63 and data:byte(5) == 9 then
-        -- -- appears # of copies are not checked anymore and times may only ever be used for afermath, I keep forgetting we dont getno party buff timers
-        -- local set_buff = {}
-        -- local set_time = {}
-        -- for n=1,32 do
-            -- local buff_id = data:unpack('H', n*2+7)
-            -- local buff_ts = data:unpack('I', n*4+69)
-
-            -- if buff_ts == 0 then
-                -- break
-            -- elseif buff_id ~= 255 then
-                -- local buff_en = res.buffs[buff_id].en:lower()
-
-                -- set_buff[buff_en] = (set_buff[buff_en] or 0) + 1
-                -- set_time[buff_en] = math.floor(buff_ts / 60 + bufftime_offset)
-            -- end
-        -- end
-        -- buffs = set_buff
-        -- times = set_time
-
-    -- elseif id == 0x00A then
-        -- local packet = packets.parse('incoming', data)
-
-        -- get.player_id = packet.Player
-        -- get.zone_id = packet.Zone
-        -- get.player_name = packet['Player Name']
-    -- end
--- end)
 
 windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
     if id == 0x028 then
@@ -491,7 +420,6 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         end
 
     elseif id == 0x63 and original:byte(5) == 9 then
-        -- appears # of copies are not checked anymore and times may only ever be used for afermath, I keep forgetting we dont getno party buff timers
         local set_buff = {}
         local set_time = {}
         for n=1,32 do
@@ -516,6 +444,17 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         get.player_id = packet.Player
         get.zone_id = packet.Zone
         get.player_name = packet.Name
+	elseif (id == 0x0DD or id == 0x0DF or id == 0x0C8) then           --Party member update
+        local parsed = packets.parse('incoming', original)
+		if parsed then
+			local playerId = parsed['ID']
+			local indexx = parsed['Index']
+			local job = parsed['Main job']
+			
+			if playerId and playerId > 0 then
+				set_registry(parsed['ID'], parsed['Main job'])
+			end
+		end
     end
 end)
 
@@ -712,9 +651,16 @@ windower.register_event('addon command', function(...)
 
         local name
         if commands[1] then
-            local member = get.party_member(commands[1])
+			local member
+			
+			if job_list(commands[1]) then
+				member = getPlayerNameFromJob(commands[1])
+			else
+				member = get.party_member(commands[1]).name
+			end
+			
             if member then
-                name = member.name
+				name = member
             else
                 for _, Name in T(setting.song):key_filter(string.ieq+{commands[1]}):it() do
                     name = Name
@@ -760,8 +706,16 @@ windower.register_event('addon command', function(...)
         addon_message('%s: %s':format(name or 'AoE', song_list:tostring()))
     elseif commands[1] == 'aoe' and commands[2] then
         local command = handled_commands.aoe[commands[#commands]]
-        local n = commands[2]:match('[1-5]')
+        local n = commands[2]:match('[1-5]') or S{'on','off'}:contains(commands[2]:lower())
         
+		if commands[2] == 'on' then
+			settings.aoe.party = true
+			return
+		elseif commands[2] == 'off' then
+			settings.aoe.party = false
+			return
+		end
+		
         local _, slot = get.party_member(commands[2])
         slot = slot or 'p'..n
 
@@ -885,6 +839,30 @@ windower.register_event('addon command', function(...)
     bard_status:text(display_box())
 end)
 
+
+function job_list(job_selection)
+	for _,jobs in pairs(res.jobs) do
+		if type(jobs)=='table' and job_selection:lower() == jobs.ens:lower() then
+			return true
+		end
+	end
+end
+
+function getPlayerNameFromJob(job)
+	local target
+	for k, v in pairs(windower.ffxi.get_party()) do
+		if type(v) == 'table' and v.mob ~= nil and v.mob.in_party then
+			if ((job:lower() == 'tank' and S{'PLD','RUN'}:contains(get_registry(v.mob.id))) or (job:lower() ~= 'tank' and get_registry(v.mob.id):lower() == job:lower())) then
+				target = v.name
+			end
+		end
+	end
+    if target ~= nil then
+        return target
+    end
+    return nil
+end
+
 function event_change()
     settings.actions = false
     debuffed = {}
@@ -945,3 +923,4 @@ windower.register_event('logout',function()
     bard_status:text(display_box())
 	windower.send_command('lua unload singer')
 end)
+windower.register_event('load', Engine)
