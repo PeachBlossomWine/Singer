@@ -11,7 +11,7 @@ return {
         ["melee"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Victory March","Valor Minuet III",},
         ["mboze"] = L{"Valor Minuet V","Valor Minuet IV","Valor Minuet III","Honor March","Valor Minuet II",},
         ["kalunga"] = L{"Adventurer's Dirge","Valor Minuet V","Blade Madrigal","Honor March","Sentinel's Scherzo",},
-        ["procne"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Blade Madrigal","Knight's Minne IV",},
+        ["procne"] = L{"Valor Minuet V","Valor Minuet IV","Blade Madrigal","Honor March","Knight's Minne IV",},
         ["tank"] = L{"Knight's Minne V","Honor March","Foe Sirvente","Sentinel's Scherzo","Mage's Ballad III",},
         ["ambu"] = L{"Valor Minuet V","Adventurer's Dirge","Honor March","Archer's Prelude","Valor Minuet III",},
         ["w2"] = L{"Adventurer's Dirge","Blade Madrigal","Honor March","Valor Minuet V","Knight's Minne V",},
@@ -45,5 +45,5 @@ return {
     },
     ["song"] = T{
     },
-    ["songs"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Blade Madrigal","Knight's Minne IV",},
+    ["songs"] = L{"Valor Minuet V","Valor Minuet IV","Blade Madrigal","Honor March","Knight's Minne IV",},
 }
