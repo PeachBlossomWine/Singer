@@ -1,7 +1,7 @@
 _addon.author = 'Ivaar - Modified by PBW'
 _addon.commands = {'Singer','sing'}
 _addon.name = 'Singer'
-_addon.version = '2.23.21.01'
+_addon.version = '2.3.1'
 
 require('luau')
 require('pack')
@@ -59,7 +59,7 @@ areas.Cities = S{
     "Aht Urhgan Whitegate",
 	"The Colosseum",
     "Tavnazian Safehold",
-    --"Nashmau",
+    "Nashmau",
     "Selbina",
     "Mhaura",
 	"Rabao",
@@ -83,7 +83,7 @@ setting = T{
     },
     debuffs = L{},
     debuffs = L{"Carnage Elegy","Pining Nocturne",},
-    dummy = L{"Puppet's Operetta","Scop's Operetta",},
+    dummy = L{"Puppet's Operetta","Scop's Operetta","Shining Fantasia","Goblin Gavotte"},
     songs = L{"Honor March","Victory March","Blade Madrigal","Valor Minuet V","Valor Minuet IV",},
     song = {},
     playlist = T{
@@ -200,16 +200,7 @@ local display_box = function()
     for k,v in ipairs(setting.songs) do
         str = str..'\n   %d:[%s]':format(k, v)
     end
-    -- for member in party:it() do
-        -- local name = member.name
-        -- if setting.song[name] then
-            -- str = str..'\n %s:':format(name)
-            -- for i, t in ipairs(setting.song[name]) do
-                -- str = str..'\n  %d:[%s]':format(i, t)
-            -- end
-        -- end
-    -- end
-	
+
 	for k,v in pairs(setting.song) do
         str = str..'\n %s:':format(k)
         for i, t in ipairs(v) do
@@ -221,16 +212,7 @@ local display_box = function()
     for k,v in ipairs(setting.debuffs) do
         str = str..'\n  %d:[%s]':format(k, v)
     end
---[[
-    for buff, targets in pairs(setting.buffs) do
-        for target in targets:it() do
-            local targ = target
-            if members[targ] then
-                str = str .. '\n %s:[%s]':format(buff, targ)
-            end
-        end
-    end
-]]
+
     str = str..'\n Dummy Songs:[%d]':format(setting.dummy:length())
 
     for k,v in pairs(settings.recast) do
@@ -353,7 +335,6 @@ end
 
 start_categories = S{8,9}
 finish_categories = S{3,5}
---buff_lost_messages = S{64,204,206,350,531}
 buff_lost_messages = S{64,74,83,123,159,168,204,206,322,341,342,343,344,350,378,453,531,647}
 death_messages = {[6]=true,[20]=true,[113]=true,[406]=true,[605]=true,[646]=true}
 
@@ -394,12 +375,11 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
             if song_buffs[buff_id] and packet['Target Count'] > 1 and (not settings.aoe.party or get.aoe_range()) then
                 song_timers.adjust(song, 'AoE', buffs)
             end
-			--table.vprint(packet)
+
             for x = 1, packet['Target Count'] do
                 local buff_id = packet['Target '..x..' Action 1 Param']
                 local targ_id = packet['Target '..x..' ID']
                 if song_buffs[buff_id] then
-					--log('adjusting: '..windower.ffxi.get_mob_by_id(targ_id).name..' buff: '..buff_id)
                     song_timers.adjust(song, windower.ffxi.get_mob_by_id(targ_id).name, buffs)
                 elseif song_debuffs[buff_id] then
                     local effect = song_debuffs[buff_id]
@@ -418,7 +398,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         if death_messages[packet.Message] then
             debuffed[packet.Target] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
-            song_timers.buff_lost:schedule(1.1,packet['Target'],packet['Param 1']) 
+            song_timers.buff_lost(packet['Target'],packet['Param 1']) 
         end
 
     elseif id == 0x63 and original:byte(5) == 9 then

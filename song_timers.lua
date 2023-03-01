@@ -149,11 +149,7 @@ function song_timers.duration(song_name, buffs)
             end
         end
     end
-    --[[
-    if buff_name then
-        song_multipliers[buff_name] = mult
-    end
-    ]]
+
     return song_timers.calc_dur(song_name, buffs, mult)
 end
 
@@ -224,7 +220,6 @@ function song_timers.adjust(spell_name,targ,buffs)
     elseif table.length(timers[targ]) < get.maxsongs(targ,buffs) and not check_dummy(targ) then
         song_timers.create(spell_name,targ,dur,current_time,buffs)
     else
-	--	log('replacing song')
         local rep,repsong
         for song_name,expires in pairs(timers[targ]) do
             if not rep or rep > expires.ts then
@@ -242,7 +237,7 @@ end
 function check_dummy(targ)
 	local count = false
 	for k,v in pairs (timers[targ]) do
-		if S{"Puppet's Operetta","Scop's Operetta","Goblin Gavotte","Shining Fantasia",}:contains(k) then
+		if setting.dummy[k] then
 			return true
 		end
 	end

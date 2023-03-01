@@ -2,12 +2,17 @@ local cast = {}
 
 function cast.JA(str)
     windower.send_command(str)
-    del = 1.5
+    del = 2.5
 end
 
 function cast.MA(str,ta)
-    windower.send_command('input /ma "%s" %s':format(str,ta))
-    del = 1.2
+	if ta ~= '<me>' and not buffs.pianissimo and setting.dummy[str] then
+		cast.JA('input /ja "Pianissimo" <me>')
+		windower.send_command:schedule(1.5, 'input /ma "%s" %s':format(str,ta))
+	else
+		windower.send_command('input /ma "%s" %s':format(str,ta))
+	end
+    del = 2.5
 end
 
 function cast.check_song(song_list,targ,buffs,spell_recasts,recasts,JA_WS_lock,recast)
