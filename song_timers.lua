@@ -151,7 +151,7 @@ function song_timers.buff_lost(targ_id,buff_id)
     local buff = get.songs[song_buffs[buff_id]]
 
     if buff then
-        local targ = windower.ffxi.get_mob_by_id(targ_id)
+        local targ = windower.ffxi.get_mob_by_id(targ_id).name
         if not targ then return end
         if not timers[targ] then return end
 
@@ -165,8 +165,8 @@ function song_timers.buff_lost(targ_id,buff_id)
         end
 
         if not song then return end
-        if not settings.song[targ] then song_timers.delete(song,'AoE') end
-        song_timers.delete(song,targ)
+        --if not settings.song[targ] then song_timers.delete(song,'AoE') end
+        song_timers.delete:schedule(1,song,targ)
         return
     end
 

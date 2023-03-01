@@ -63,7 +63,7 @@ areas.Cities = S{
     "Selbina",
     "Mhaura",
 	"Rabao",
-    "Norg",
+    --"Norg",
     "Kazham",
     "Eastern Adoulin",
     "Western Adoulin",
@@ -353,7 +353,8 @@ end
 
 start_categories = S{8,9}
 finish_categories = S{3,5}
-buff_lost_messages = S{64,204,206,350,531}
+--buff_lost_messages = S{64,204,206,350,531}
+buff_lost_messages = S{64,74,83,123,159,168,204,206,322,341,342,343,344,350,378,453,531,647}
 death_messages = {[6]=true,[20]=true,[113]=true,[406]=true,[605]=true,[646]=true}
 
 windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
@@ -393,6 +394,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
             if song_buffs[buff_id] and packet['Target Count'] > 1 and (not settings.aoe.party or get.aoe_range()) then
                 song_timers.adjust(song, 'AoE', buffs)
             end
+			--table.vprint(packet)
             for x = 1, packet['Target Count'] do
                 local buff_id = packet['Target '..x..' Action 1 Param']
                 local targ_id = packet['Target '..x..' ID']
@@ -412,7 +414,6 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
 
     elseif id == 0x029 then
         local packet = packets.parse('incoming', original)
-
         if death_messages[packet.Message] then
             debuffed[packet.Target] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
@@ -816,7 +817,7 @@ windower.register_event('addon command', function(...)
         else
             addon_message('Invalid song name.')
         end
-   elseif type(default[commands[1]]) == 'number' and commands[2] and tonumber(commands[2]) then
+	elseif type(default[commands[1]]) == 'number' and commands[2] and tonumber(commands[2]) then
         settings[commands[1]] = tonumber(commands[2])
         addon_message('%s is now set to %s':format(commands[1],settings[commands[1]]))
     elseif type(default[commands[1]]) == 'boolean' then
@@ -835,6 +836,8 @@ windower.register_event('addon command', function(...)
         song_timers.reset()
     elseif commands[1] == 'eval' then
         assert(loadstring(table.concat(commands, ' ',2)))()
+	elseif commands[1] == 'show' then
+		table.vprint(timers)
     end
     bard_status:text(display_box())
 end)
