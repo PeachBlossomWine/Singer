@@ -45,5 +45,5 @@ return {
     },
     ["song"] = T{
     },
-    ["songs"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Victory March","Valor Minuet III",},
+    ["songs"] = L{},
 }

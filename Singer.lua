@@ -59,11 +59,11 @@ areas.Cities = S{
     "Aht Urhgan Whitegate",
 	"The Colosseum",
     "Tavnazian Safehold",
-    "Nashmau",
+    --"Nashmau",
     "Selbina",
     "Mhaura",
 	"Rabao",
-    --"Norg",
+    "Norg",
     "Kazham",
     "Eastern Adoulin",
     "Western Adoulin",
@@ -399,6 +399,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
                 local buff_id = packet['Target '..x..' Action 1 Param']
                 local targ_id = packet['Target '..x..' ID']
                 if song_buffs[buff_id] then
+					--log('adjusting: '..windower.ffxi.get_mob_by_id(targ_id).name..' buff: '..buff_id)
                     song_timers.adjust(song, windower.ffxi.get_mob_by_id(targ_id).name, buffs)
                 elseif song_debuffs[buff_id] then
                     local effect = song_debuffs[buff_id]
@@ -417,7 +418,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         if death_messages[packet.Message] then
             debuffed[packet.Target] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
-            song_timers.buff_lost(packet['Target'],packet['Param 1']) 
+            song_timers.buff_lost:schedule(1.1,packet['Target'],packet['Param 1']) 
         end
 
     elseif id == 0x63 and original:byte(5) == 9 then
