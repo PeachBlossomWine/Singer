@@ -25,13 +25,6 @@ song_buffs = {
     [222] = 'scherzo',
     }
 
--- song_debuffs = {
-    -- [2] = 'lullaby',
-    -- [194] = 'elegy',
-    -- [217] = 'threnody',
-    -- [223] = 'nocturne',
-    -- }
-
 local equip_mods = {
     [18342] = {0.2},            -- 'Gjallarhorn',    -- 75
     [18577] = {0.2},            -- 'Gjallarhorn',    -- 80
@@ -157,13 +150,13 @@ function song_timers.buff_lost(targ_id,buff_id)
     local buff = get.songs[song_buffs[buff_id]]
 
     if buff then
-        local targ = windower.ffxi.get_mob_by_id(targ_id).name
-        if not targ then return end
-        if not timers[targ] then return end
+        local targ = windower.ffxi.get_mob_by_id(targ_id)
+        if not targ.name then return end
+        if not timers[targ.name] then return end
 
         local minimum,song
         for k,song_name in pairs(buff) do
-            local song_timer = timers[targ][song_name]
+            local song_timer = timers[targ.name][song_name]
             if song_timer and (not minimum or song_timer.ts < minimum) then
                 minimum = song_timer.ts
                 song = song_name
@@ -171,9 +164,16 @@ function song_timers.buff_lost(targ_id,buff_id)
         end
 
         if not song then return end
-        --if setting.song[targ] then song_timers.delete(song,'AoE') end
-		if settings.aoe.party then song_timers.delete(song,'AoE') end
-        song_timers.delete(song,targ)
+		if settings.aoe.party then
+			local party = windower.ffxi.get_party()
+			for slot in get.party_slots:it() do
+				if party[slot].name == targ.name and settings.aoe[slot] then
+					song_timers.delete(song,'AoE')
+				end
+			end
+		end
+		song_timers.delete(song,targ.name)
+		--review_active_buffs(targ)
         return
     end
 end
@@ -199,7 +199,12 @@ end
 
 function song_timers.create(song,targ,dur,current_time,buffs)
     timers[targ][song] = {ts=current_time+dur,nt=buffs.troubadour,sv=buffs['soul voice']}
-    if timers.AoE[song] and targ ~= 'AoE' or not settings.timers then return end
+	if not settings.aoe.party then
+		if timers['AoE'] and timers['AoE'][song] then
+			timers['AoE'][song] = {ts=current_time+dur,nt=buffs.troubadour,sv=buffs['soul voice']}
+		end
+	end
+    if timers['AoE'] and timers['AoE'][song] and targ ~= 'AoE' or not settings.timers then return end
 end
 
 function song_timers.adjust(spell_name,targ,buffs)
@@ -223,6 +228,10 @@ function song_timers.adjust(spell_name,targ,buffs)
         if repsong then
             song_timers.delete(repsong,targ)
             song_timers.create(spell_name,targ,dur,current_time,buffs)
+			if not settings.aoe.party then
+				song_timers.delete(repsong,'AoE')
+				song_timers.create(spell_name,'AoE',dur,current_time,buffs)
+			end
         end
 	end
 end
@@ -239,7 +248,7 @@ end
 
 function song_timers.reset(bool)
     if bool then return end
-    timers = {AoE={},buffs={Haste={},Refresh={}}}
+    timers = {AoE={}}
     casting = false
 end
 

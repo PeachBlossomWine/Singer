@@ -17,7 +17,7 @@ song_timers = require('song_timers')
 default = {
     interval = 0.1,
     delay=3,
-    marcato='Sentinel\'s Scherzo',
+    marcato='Honor March',
     soul_voice=false,
     clarion=false,
     actions=false,
@@ -91,37 +91,80 @@ del = 0
 counter = 0
 timers = {AoE={}}
 party = get.party()
-last_coords = 'fff':pack(0,0,0)
 buffs = get.buffs()
-times = {}
 color = {}
 
 local save_file
 job_registry = T{}
 
+__party_buff_list = {}
+
 function process_buff_packet(target_id, status)
     if not target_id then return end
     local target = windower.ffxi.get_mob_by_id(target_id)
     if not target then return end
+	local temp_buff_table = {}
 
-   -- review_active_buffs(target, status)
+	for k,v in pairs(status) do
+		if song_buffs[v] then
+			table.insert(temp_buff_table, v)
+		end
+	end
+	__party_buff_list[target.name] = __party_buff_list[target.name] or {}
+	__party_buff_list[target.name] = temp_buff_table
+	review_full_dispel(target)
 end
 
-function review_active_buffs(player, buff_list)
-    if buff_list ~= nil then
-	local song_in_list = false
-	local temp_timer_table = {}
-
-        for _,bid in pairs(buff_list) do
-			local curr_song = nil
-            local buff = res.buffs[bid]
-            if song_buffs[bid] then
-				for k,v in pairs(timers[player.name]) do
-				
+function review_full_dispel(player)
+	--Full dispel table handling
+    if next(__party_buff_list[player.name]) == nil and timers[player.name] then
+		timers[player.name] = nil
+		if settings.aoe.party then
+			local party = windower.ffxi.get_party()
+			for slot in get.party_slots:it() do
+				if party[slot].name == player.name and settings.aoe[slot] then
+					timers['AoE'] = nil	
 				end
-            end
-        end
+			end
+		end
+		return
 	end
+end
+
+function review_missing_songs(player)
+	if not timers[player.name] then return end
+	local tcat
+	local tsongname
+	local temp_buff_list = {}
+	
+	local truesong = false
+	for t_fullname,_ in pairs(timers[player.name]) do
+		truesong = false
+		--local t_player_songs = timers[player.name]
+		for t_cat,t_songs in pairs(get.songs) do
+			for _,t_song_name in pairs(t_songs) do
+				if t_song_name == t_fullname then
+					tcat = t_cat or nil
+					log(t_cat)
+					break
+				end
+			end
+		end
+		temp_buff_list = __party_buff_list[player.name]
+		for _,bid in pairs(temp_buff_list) do
+			local buff = res.buffs[bid]
+			if tcat == bid then
+				temp_buff_list[_] = nil
+				truesong = true
+				table.vprint(temp_buff_list)
+				break
+			end
+		
+		end
+		if not truesong then timers[player.name][t_fullname]= nil end
+		
+	end
+
 end
 
 function set_registry(id, job_id)
@@ -245,7 +288,7 @@ bard_status:show()
 
 function primary_song_check()
     bard_status:text(display_box())
-    if not settings.actions then return end-- or areas:contains(res.zones[zone_id].en) then return end
+    if not settings.actions or areas:contains(res.zones[zone_id].en) then return end
 
     counter = counter + settings.interval
     if counter >= del then
@@ -264,11 +307,17 @@ function primary_song_check()
             song_timers.update(k)
         end
 
-        if not settings.aoe.party or get.aoe_range() then
+        if settings.aoe.party and get.aoe_range() then
             if cast.check_song(setting.songs,'AoE',buffs,spell_recasts,ability_recasts,JA_WS_lock,recast) then
                 return
             end
         end
+
+		if not settings.aoe.party then
+			if cast.check_song(setting.songs,'AoE',buffs,spell_recasts,ability_recasts,JA_WS_lock,recast) then
+                return
+            end
+		end
 
         if settings.pianissimo then
             for targ, songs in pairs(setting.song) do
@@ -348,6 +397,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         local packet = packets.parse('incoming', original)
         if death_messages[packet.Message] then
 			timers[packet.Target] = nil
+			timers['AoE'] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
             song_timers.buff_lost(packet['Target'],packet['Param 1']) 
         end
@@ -369,7 +419,6 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
             end
         end
         buffs = set_buff
-        times = set_time
 	elseif id == 0x076 then
         for k = 0, 4 do
             local id = original:unpack('I', k*48+5)
@@ -757,9 +806,25 @@ windower.register_event('addon command', function(...)
     elseif commands[1] == 'eval' then
         assert(loadstring(table.concat(commands, ' ',2)))()
 	elseif commands[1] == 'show' then
-		table.vprint(timers)
+		--table.vprint(timers)
 		--table.vprint(buffs)
-		--table.vprint(party)
+		print(string.format("Timers Table Size: %d", T(timers):length()))
+		print(string.format("Party Table Size: %d", T(party):length()))
+		print(string.format("Buffs Table Size: %d", T(buffs):length()))
+		print(string.format("Buff Table Size: %d", T(buff):length()))
+	elseif commands[1] == 'sh' then
+		table.vprint(timers)
+		table.vprint(buffs)
+		
+	elseif commands[1] == 'test' then
+	-- for t_cat,t_songs in pairs(get.songs) do
+		-- log(t_cat)
+		-- for _,t_song_name in pairs(t_songs) do
+			-- log(t_song_name)
+		-- end
+		
+	-- end
+	table.vprint(settings.aoe)
     end
     bard_status:text(display_box())
 end)

@@ -341,7 +341,7 @@ function get.valid_ally(name, distance)
     return false
 end
 
-function get.aoe_range(name)
+function get.aoe_range()
     local party = windower.ffxi.get_party()
 
     for slot in get.party_slots:it() do
