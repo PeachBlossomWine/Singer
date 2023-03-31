@@ -40,22 +40,6 @@ get.songs = {
     dark = {'Dark Carol','Dark Carol II'},
 }
 
-get.debuffs = {
-    lullaby = {'Horde Lullaby II','Horde Lullaby','Foe Lullaby II','Foe Lullaby'},
-    elegy = {'Carnage Elegy'},
-    nocturne = {'Pining Nocturne'},
-    threnody = {
-         fire = 'Fire Threnody', fire2 = 'Fire Threnody II',
-         ice = 'Ice Threnody', ice2 = 'Ice Threnody II',
-         wind = 'Wind Threnody', wind2 = 'Wind Threnody II',
-         earth = 'Earth Threnody', earth2 = 'Earth Threnody II',
-         lightning = 'Ltng. Threnody', lightning2 = 'Ltng. Threnody II',
-         water = 'Water Threnody', water2 = 'Water Threnody II',
-         light = 'Light Threnody', light2 = 'Light Threnody II',
-         dark = 'Dark Threnody', dark2 = 'Dark Threnody II',
-    }
-}
-
 local ext_songs = {
     etude = {
         str = {'Herculean Etude','Sinewy Etude'},
@@ -207,22 +191,6 @@ local song = {
     [878] = 'Dark Threnody II',
     }
 
-local spell = {
-    [57] = {id=57,enl='Haste',dur=180},
-    [109] = {id=109,enl='Refresh',dur=150},
-    [119] = {id=119,enl='Aurorastorm',dur=180},
-    [115] = {id=115,enl='Firestorm',dur=300},
-    }
-
---[[
-song = {}
-for k,v in ipairs(res.spells) do
-    if v.type == 'BardSong' then
-        song[k] = v.en
-    end
-end
-]]
-
 do
     local info = windower.ffxi.get_info()
 
@@ -301,32 +269,13 @@ function get.buffs()
     local set_buff = {}
     for _, buff_id in ipairs(windower.ffxi.get_player().buffs) do
         local buff_en = res.buffs[buff_id].en:lower()
-        if buff_id == 272 then
-            set_buff[buff_en] = 1
-            times[buff_en] = 10
-        else
-            set_buff[buff_en] = (set_buff[buff_en] or 0) + 1
-        end
+        set_buff[buff_en] = (set_buff[buff_en] or 0) + 1
     end
     return set_buff
 end
 
-function get.spell_by_id(id)
-    return spell[id]
-end
-
 function get.song_name(id)
     return song[id]
-end
-
-function get.spell(name)
-    name = string.lower(name)
-    for k,v in pairs(spell) do
-        if v and v.enl and string.lower(v.enl) == name then
-            return v
-        end
-    end
-    return nil
 end
 
 function get.song_by_name(name)
@@ -410,7 +359,8 @@ function get.party()
 end
 
 function get.party_member(name)
-    return name and party:with('name', string.ieq+{name})
+	party = get.party()
+    return name and party:with('name', string.ieq+{name}) or nil
 end
 
 return get

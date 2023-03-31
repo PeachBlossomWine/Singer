@@ -25,12 +25,12 @@ song_buffs = {
     [222] = 'scherzo',
     }
 
-song_debuffs = {
-    [2] = 'lullaby',
-    [194] = 'elegy',
-    [217] = 'threnody',
-    [223] = 'nocturne',
-    }
+-- song_debuffs = {
+    -- [2] = 'lullaby',
+    -- [194] = 'elegy',
+    -- [217] = 'threnody',
+    -- [223] = 'nocturne',
+    -- }
 
 local equip_mods = {
     [18342] = {0.2},            -- 'Gjallarhorn',    -- 75
@@ -171,15 +171,10 @@ function song_timers.buff_lost(targ_id,buff_id)
         end
 
         if not song then return end
-        --if not setting.song[targ] then song_timers.delete(song,'AoE') end
+        --if setting.song[targ] then song_timers.delete(song,'AoE') end
+		if settings.aoe.party then song_timers.delete(song,'AoE') end
         song_timers.delete(song,targ)
         return
-    end
-
-    local debuff = song_debuffs[buff_id]
-
-    if debuff and debuffed[targ_id] then
-        debuffed[targ_id][debuff] = nil
     end
 end
 
@@ -200,13 +195,11 @@ end
 
 function song_timers.delete(song,targ)
     timers[targ][song] = nil
-    windower.send_command('timers delete "%s [%s]"':format(song,targ))
 end
 
 function song_timers.create(song,targ,dur,current_time,buffs)
     timers[targ][song] = {ts=current_time+dur,nt=buffs.troubadour,sv=buffs['soul voice']}
     if timers.AoE[song] and targ ~= 'AoE' or not settings.timers then return end
-    windower.send_command('timers create "%s [%s]" %s down':format(song,targ,dur))
 end
 
 function song_timers.adjust(spell_name,targ,buffs)
@@ -245,11 +238,6 @@ function check_dummy(targ)
 end
 
 function song_timers.reset(bool)
-    for k,targ in pairs(timers) do
-        for i,v in pairs(targ) do
-            windower.send_command('timers delete "%s [%s]"':format(i,k))
-        end
-    end
     if bool then return end
     timers = {AoE={},buffs={Haste={},Refresh={}}}
     casting = false

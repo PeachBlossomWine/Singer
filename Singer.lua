@@ -16,7 +16,7 @@ song_timers = require('song_timers')
 
 default = {
     interval = 0.1,
-    delay=2,
+    delay=3,
     marcato='Sentinel\'s Scherzo',
     soul_voice=false,
     clarion=false,
@@ -24,7 +24,6 @@ default = {
     pianissimo=false,
     nightingale=true,
     troubadour=true,
-    debuffing=false,
 	nitro=true,
     recast={song={min=20,max=45},buff={min=5,max=10}},
     active=false,
@@ -35,10 +34,8 @@ default = {
     box={bg={visible=false},text={size=10},pos={x=650,y=0}},
 }
 
-areas = {}
-
 -- City areas for town gear and behavior.
-areas.Cities = S{
+areas = S{
     "Ru'Lude Gardens",
     "Upper Jeuno",
     "Lower Jeuno",
@@ -72,17 +69,16 @@ areas.Cities = S{
 	"Leafallia"
 }
 
+local info = windower.ffxi.get_info()
+
+if info.logged_in then
+    zone_id = info.zone
+end
+
 settings = config.load(default)
 
 setting = T{
-    buffs = T{
-        haste = L{},
-        refresh = L{},
-        firestorm = L{},
-        aurorastorm = L{},
-    },
-    debuffs = L{},
-    debuffs = L{"Carnage Elegy","Pining Nocturne",},
+    buffs = T{},
     dummy = L{"Puppet's Operetta","Scop's Operetta","Shining Fantasia","Goblin Gavotte"},
     songs = L{"Honor March","Victory March","Blade Madrigal","Valor Minuet V","Valor Minuet IV",},
     song = {},
@@ -91,8 +87,42 @@ setting = T{
     },
 }
 
+del = 0
+counter = 0
+timers = {AoE={}}
+party = get.party()
+last_coords = 'fff':pack(0,0,0)
+buffs = get.buffs()
+times = {}
+color = {}
+
 local save_file
 job_registry = T{}
+
+function process_buff_packet(target_id, status)
+    if not target_id then return end
+    local target = windower.ffxi.get_mob_by_id(target_id)
+    if not target then return end
+
+   -- review_active_buffs(target, status)
+end
+
+function review_active_buffs(player, buff_list)
+    if buff_list ~= nil then
+	local song_in_list = false
+	local temp_timer_table = {}
+
+        for _,bid in pairs(buff_list) do
+			local curr_song = nil
+            local buff = res.buffs[bid]
+            if song_buffs[bid] then
+				for k,v in pairs(timers[player.name]) do
+				
+				end
+            end
+        end
+	end
+end
 
 function set_registry(id, job_id)
     if not id then return false end
@@ -156,22 +186,13 @@ do
     bufftime_offset = math.floor(time - (vana_time * 60 % 0x100000000) / 60)
 end
 
-del = 0
-counter = 0
-timers = {AoE={}, buffs={}}
-party = get.party()
-last_coords = 'fff':pack(0,0,0)
-buffs = get.buffs()
-times = {}
-debuffed = {}
-color = {}
 
 function colorize(row, str)
     if not color[row] then return str end
     return '\\cs(0,255,0)%s\\cr':format(str)
 end
 
-local buttons = {'active','actions','nitro','pianissimo','debuffing','party','p1','p2','p3','p4','p5'}
+local buttons = {'active','actions','nitro','pianissimo','party','p1','p2','p3','p4','p5'}
 
 local display_box = function()
     local str = colorize(1, 'Singer')
@@ -181,8 +202,7 @@ local display_box = function()
 
     str = str..colorize(3, '\n Nitro:[%s]':format(settings.nitro and 'On' or 'Off'))
     str = str..colorize(4, '\n Pianissimo:[%s]':format(settings.pianissimo and 'On' or 'Off'))
-    str = str..colorize(5, '\n Debuffing:[%s]':format(settings.debuffing and 'On' or 'Off'))
-    str = str..colorize(6, '\n AoE: [%s]':format(settings.aoe.party and 'On' or 'Off'))
+    str = str..colorize(5, '\n AoE: [%s]':format(settings.aoe.party and 'On' or 'Off'))
 
     if settings.aoe.party then
         for x = 1, 5 do
@@ -193,7 +213,7 @@ local display_box = function()
 			else
 				member = ''
 			end
-            str = str..colorize(x + 6,'\n <%s> [%s] %s':format(slot, settings.aoe[slot] and 'On' or 'Off', member))
+            str = str..colorize(x + 5,'\n <%s> [%s] %s':format(slot, settings.aoe[slot] and 'On' or 'Off', member))
         end
     end
     str = str..'\n Marcato:\n  [%s]':format(settings.marcato)
@@ -206,11 +226,6 @@ local display_box = function()
         for i, t in ipairs(v) do
             str = str..'\n  %d:[%s]':format(i,t)
         end
-    end
-
-    str = str .. '\n Debuffs:'
-    for k,v in ipairs(setting.debuffs) do
-        str = str..'\n  %d:[%s]':format(k, v)
     end
 
     str = str..'\n Dummy Songs:[%d]':format(setting.dummy:length())
@@ -228,11 +243,10 @@ end
 bard_status = texts.new(display_box(),settings.box,settings)
 bard_status:show()
 
-function do_stuff()
+function primary_song_check()
     bard_status:text(display_box())
-    local world = res.zones[windower.ffxi.get_info().zone].name
-    if not settings.actions or areas.Cities:contains(world) then return end
-    party = get.party()
+    if not settings.actions then return end-- or areas:contains(res.zones[zone_id].en) then return end
+
     counter = counter + settings.interval
     if counter >= del then
         counter = 0
@@ -240,29 +254,7 @@ function do_stuff()
         local play = windower.ffxi.get_player()
 
         if not play or play.main_job ~= 'BRD' or (play.status ~= 1 and play.status ~= 0) then return end
-        if is_moving or buffs.stun or buffs.sleep or buffs.charm or buffs.terror or buffs.petrification then return end
-
-        local JA_WS_lock = buffs.amnesia or buffs.impairment
-
-        if use_ws and not JA_WS_lock and play.status == 1 then
-            local targ = windower.ffxi.get_mob_by_target('t')
-            local goal_tp
-            if not times['aftermath: lv.3'] or os.time() - times['aftermath: lv.3'] <= 5 then
-                goal_tp = 3000
-            else
-                goal_tp = 1000
-            end
-            if (get.eye_sight(windower.ffxi.get_mob_by_target('me'),targ) and play.vitals.tp >= goal_tp and 
-                targ and targ.valid_target and targ.is_npc and targ.hpp < settings.max_ws and targ.hpp > settings.min_ws and  
-                math.sqrt(targ.distance) <= 4) and (goal_tp == 1000 or not buffs['aftermath: lv.3']) then
-
-                windower.send_command('input /ws "Mordant Rime" <t>')
-                del = 4.2
-                return
-            end
-        end
-
-        if buffs.silence or buffs.mute or buffs.omerta then return end
+        if is_moving or buffs.stun or buffs.sleep or buffs.charm or buffs.terror or buffs.petrification or buffs.mute or buffs.omerta then return end
 
         local spell_recasts = windower.ffxi.get_spell_recasts()
         local ability_recasts = windower.ffxi.get_ability_recasts()
@@ -289,48 +281,20 @@ function do_stuff()
             end
         end
 
-        local recast = math.random(settings.recast.buff.min,settings.recast.buff.max)+math.random()
-        for key,targets in pairs(setting.buffs) do
-            local spell = get.spell(key)
-            for k,targ in ipairs(targets) do
-                if targ and spell and spell_recasts[spell.id] <= 0 and get.valid_ally(targ:lower(), 20) and play.vitals.mp >= 40 and
-                (not timers.buffs or not timers.buffs[spell.enl] or not timers.buffs[spell.enl][targ] or 
-                os.time() - timers.buffs[spell.enl][targ]+recast > 0) then
-                    cast.MA(spell.enl,targ)
-                    return
-                end
-            end
-        end
-
-        if settings.debuffing then
-            local targ = windower.ffxi.get_mob_by_target('bt')
-
-            if targ and targ.hpp > 0 and targ.valid_target and targ.distance:sqrt() < 20 then
-                for song in setting.debuffs:it() do
-                    local effect
-                    for k,v in pairs(get.debuffs) do
-                        if table.find(v, song) then
-                            effect =  k
-                            break
-                        end
-                    end
-
-                    if effect and (not debuffed[targ.id] or not debuffed[targ.id][effect]) and spell_recasts[get.song_by_name(song).id] == 0 then
-                        cast.MA(song,'<bt>')
-                        break
-                    end
-                end
-            end
-        end
     end
 end
 
-function Engine()
-	do_stuff()
-	coroutine.schedule(Engine,settings.interval)
+local last_render = 0
+function handle_prerender()
+	if (os.clock()-last_render) > settings.interval then
+		primary_song_check()
+		last_render = os.clock()
+	end
 end
 
---do_stuff:loop(settings.interval)
+function handle_load()
+	settings.actions = false
+end
 
 
 start_categories = S{8,9}
@@ -341,6 +305,8 @@ death_messages = {[6]=true,[20]=true,[113]=true,[406]=true,[605]=true,[646]=true
 windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
     if id == 0x028 then
         local packet = packets.parse('incoming', original)
+		local tact = nil
+		
         if packet['Actor'] ~= get.player_id then return false end
         if packet['Category'] == 8 then
             if (packet['Param'] == 24931) then
@@ -349,23 +315,12 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
             elseif (packet['Param'] == 28787) then
             -- Failed Casting
                 is_casting = false
-                del = 2.2
+                del = 2.5
             end
         elseif packet['Category'] == 4 then
             -- Finish Casting
             is_casting = false
             del = settings.delay
-            local spell = get.spell_by_id(packet['Param'])
-
-            if spell then
-                local targ = windower.ffxi.get_mob_by_id(packet['Target 1 ID'])
-
-                if targ then
-                    timers.buffs[spell.enl] = timers.buffs[spell.enl] or {}
-                    timers.buffs[spell.enl][targ.name] = os.time() + spell.dur
-                end
-                return
-            end
 
             local song = get.song_name(packet['Param'])
 
@@ -381,10 +336,6 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
                 local targ_id = packet['Target '..x..' ID']
                 if song_buffs[buff_id] then
                     song_timers.adjust(song, windower.ffxi.get_mob_by_id(targ_id).name, buffs)
-                elseif song_debuffs[buff_id] then
-                    local effect = song_debuffs[buff_id]
-                    debuffed[targ_id] = debuffed[targ_id] or {}
-                    debuffed[targ_id][effect] = true
                 end
             end
         elseif finish_categories:contains(packet['Category']) then
@@ -396,7 +347,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
     elseif id == 0x029 then
         local packet = packets.parse('incoming', original)
         if death_messages[packet.Message] then
-            debuffed[packet.Target] = nil
+			timers[packet.Target] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
             song_timers.buff_lost(packet['Target'],packet['Param 1']) 
         end
@@ -419,7 +370,23 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         end
         buffs = set_buff
         times = set_time
+	elseif id == 0x076 then
+        for k = 0, 4 do
+            local id = original:unpack('I', k*48+5)
+            local new_buffs_list = {}
 
+            local new_i = 0
+            if id ~= 0 then
+                for i = 1, 32 do
+                    local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
+                    if buff == 255 then
+                        break
+                    end
+                    new_buffs_list[i] = buff
+                end
+            end
+           process_buff_packet(id, new_buffs_list)
+        end
     elseif id == 0x00A then
         local packet = packets.parse('incoming', original)
 
@@ -472,7 +439,6 @@ short_commands = {
     ['n'] = 'nitro',
     ['t'] = 'troubadour',
     ['pl'] = 'playlist',
-    ['d'] = 'debuffing',
 }
 
 local function save_playlist(commands)
@@ -517,7 +483,6 @@ windower.register_event('addon command', function(...)
         if settings.actions then
             del = 0
             initialize()
-            do_stuff()
         end
         addon_message('Actions %s':format(settings.actions and 'On' or 'Off'))
     elseif commands[1] == 'save' then
@@ -638,7 +603,7 @@ windower.register_event('addon command', function(...)
 			if job_list(commands[1]) then
 				member = getPlayerNameFromJob(commands[1])
 			else
-				member = get.party_member(commands[1]).name
+				member = get.party_member(commands[1]) and get.party_member(commands[1]).name
 			end
 			
             if member then
@@ -649,6 +614,7 @@ windower.register_event('addon command', function(...)
                 end
             end
             if not name then
+				addon_message('Error: '..commands[1]..' is not in party.')
                 return
             end
             setting.song[name] = setting.song[name] or L{}
@@ -762,33 +728,6 @@ windower.register_event('addon command', function(...)
         else
             addon_message('Invalid song name.')
         end
-    elseif setting.buffs:containskey(commands[1]) and commands[2] then
-        local name = commands[2]:ucfirst()
-        local ind = setting.buffs[commands[1]]:find(name)
-
-        if ind and not commands[3] or ind and commands[3] == 'off' then
-            setting.buffs[commands[1]]:remove(ind)
-            addon_message('Will stop buffing %s with %s':format(name, commands[1]:ucfirst()))
-        elseif not ind and (not commands[3] or commands[3] == 'on') then
-            setting.buffs[commands[1]]:append(name)
-            addon_message('Will now buff %s with %s':format(name, commands[1]:ucfirst()))
-        elseif commands[3] == 'on' then
-            addon_message('Already buffing %s with %s':format(name, commands[1]:ucfirst()))
-        end
-    elseif commands[1] == 'debuff' and commands[2] then
-        local debuff = resolve_song(commands)
-
-        if not debuff then
-            return
-        end
-
-        local ind = setting.debuffs:find(debuff)
-
-        if ind then
-            setting.debuffs:remove(ind)
-        else
-            setting.debuffs:append(debuff)
-        end
     elseif type(default[commands[1]]) == 'string' and commands[2] then
         local song = resolve_song(commands)
 
@@ -819,6 +758,8 @@ windower.register_event('addon command', function(...)
         assert(loadstring(table.concat(commands, ' ',2)))()
 	elseif commands[1] == 'show' then
 		table.vprint(timers)
+		--table.vprint(buffs)
+		--table.vprint(party)
     end
     bard_status:text(display_box())
 end)
@@ -852,7 +793,13 @@ end
 
 function event_change()
     settings.actions = false
-    debuffed = {}
+    song_timers.reset()
+    bard_status:text(display_box())
+end
+
+function handle_zone_change(new_id, old_id)
+	zone_id = new_id
+	settings.actions = false
     song_timers.reset()
     bard_status:text(display_box())
 end
@@ -899,15 +846,18 @@ function mouse_event(type, x, y, delta, blocked)
     end
 end
 
-windower.register_event('mouse', mouse_event)
-windower.register_event('unload', song_timers.reset)
-windower.register_event('status change', status_change)
-windower.register_event('zone change','job change', event_change)
-windower.register_event('logout',function()
-    settings.actions = false
-    debuffed = {}
+function handle_logout()
+	settings.actions = false
     song_timers.reset()
     bard_status:text(display_box())
 	windower.send_command('lua unload singer')
-end)
-windower.register_event('load', Engine)
+end
+
+windower.register_event('mouse', mouse_event)
+windower.register_event('unload', song_timers.reset)
+windower.register_event('status change', status_change)
+windower.register_event('job change', event_change)
+windower.register_event('zone change', handle_zone_change)
+windower.register_event('logout', handle_logout)
+windower.register_event('load', handle_load)
+windower.register_event('prerender', handle_prerender)
