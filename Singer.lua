@@ -397,7 +397,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         local packet = packets.parse('incoming', original)
         if death_messages[packet.Message] then
 			timers[packet.Target] = nil
-			timers['AoE'] = nil
+			--timers['AoE'] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
             song_timers.buff_lost(packet['Target'],packet['Param 1']) 
         end

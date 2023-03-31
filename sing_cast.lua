@@ -52,7 +52,7 @@ function cast.check_song(song_list,targ,buffs,spell_recasts,recasts,JA_WS_lock,r
                 cast.JA('input /ja "Troubadour" <me>')
 				-- Reset timers when Nitro and NOT 5 songs			
 				if not buffs['clarion call'] and currsongs < 5 then
-					song_timers.reset()
+				--	song_timers.reset()
 				end
             elseif ta == '<me>' and not JA_WS_lock and song.enl == settings.marcato and not buffs.marcato and not buffs['soul voice'] and recasts[48] <= 0 then
                 cast.JA('input /ja "Marcato" <me>')
