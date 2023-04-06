@@ -172,8 +172,10 @@ function song_timers.buff_lost(targ_id,buff_id)
 				end
 			end
 		end
+		if targ.name == windower.ffxi.get_player().name then
+			song_timers.delete(song,'AoE')
+		end
 		song_timers.delete(song,targ.name)
-		--review_active_buffs(targ)
         return
     end
 end

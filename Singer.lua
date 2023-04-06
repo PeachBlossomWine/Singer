@@ -98,6 +98,7 @@ local save_file
 job_registry = T{}
 
 __party_buff_list = {}
+__pbuff_timestamp = os.clock()
 
 function process_buff_packet(target_id, status)
     if not target_id then return end
@@ -133,38 +134,43 @@ end
 
 function review_missing_songs(player)
 	if not timers[player.name] then return end
+	if not __party_buff_list[player.name] then return end
+	
 	local tcat
 	local tsongname
 	local temp_buff_list = {}
-	
 	local truesong = false
+	
 	for t_fullname,_ in pairs(timers[player.name]) do
 		truesong = false
-		--local t_player_songs = timers[player.name]
 		for t_cat,t_songs in pairs(get.songs) do
 			for _,t_song_name in pairs(t_songs) do
 				if t_song_name == t_fullname then
 					tcat = t_cat or nil
-					log(t_cat)
 					break
 				end
 			end
 		end
+
 		temp_buff_list = __party_buff_list[player.name]
 		for _,bid in pairs(temp_buff_list) do
-			local buff = res.buffs[bid]
-			if tcat == bid then
+			local buff_name = res.buffs[bid].en
+			if tcat == buff_name then
 				temp_buff_list[_] = nil
 				truesong = true
-				table.vprint(temp_buff_list)
+				
+				__party_buff_list[player.name] = temp_buff_list
 				break
 			end
 		
 		end
 		if not truesong then timers[player.name][t_fullname]= nil end
-		
+		if settings.aoe.party and not truesong then
+			timers['AoE'][t_fullname]= nil
+		end
 	end
-
+	table.vprint(__party_buff_list[player.name])
+	table.vprint(timers[player.name])
 end
 
 function set_registry(id, job_id)
@@ -396,12 +402,15 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
     elseif id == 0x029 then
         local packet = packets.parse('incoming', original)
         if death_messages[packet.Message] then
-			timers[packet.Target] = nil
+			--timers[packet.Target] = nil
 			--timers['AoE'] = nil
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
             song_timers.buff_lost(packet['Target'],packet['Param 1']) 
+			local mob_entity = windower.ffxi.get_mob_by_id(packet['Target'])
+			if packet['Target'] ~= get.player_id then --and get.party_member(mob_entity.name) then
+				review_missing_songs(mob_entity)
+			end
         end
-
     elseif id == 0x63 and original:byte(5) == 9 then
         local set_buff = {}
         local set_time = {}
@@ -814,7 +823,6 @@ windower.register_event('addon command', function(...)
 		print(string.format("Buff Table Size: %d", T(buff):length()))
 	elseif commands[1] == 'sh' then
 		table.vprint(timers)
-		table.vprint(buffs)
 		
 	elseif commands[1] == 'test' then
 	-- for t_cat,t_songs in pairs(get.songs) do
@@ -824,7 +832,8 @@ windower.register_event('addon command', function(...)
 		-- end
 		
 	-- end
-	table.vprint(settings.aoe)
+	table.vprint(__party_buff_list)
+	--table.vprint(settings.aoe)
     end
     bard_status:text(display_box())
 end)
