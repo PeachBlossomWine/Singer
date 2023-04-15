@@ -407,7 +407,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         elseif buff_lost_messages:contains(packet.Message) and packet['Actor'] == get.player_id then
             song_timers.buff_lost(packet['Target'],packet['Param 1']) 
 			local mob_entity = windower.ffxi.get_mob_by_id(packet['Target'])
-			if packet['Target'] ~= get.player_id then --and get.party_member(mob_entity.name) then
+			if packet['Target'] ~= get.player_id and get.songs[song_buffs[packet['Param 1']]] then --and get.party_member(mob_entity.name) then
 				review_missing_songs(mob_entity)
 			end
         end
