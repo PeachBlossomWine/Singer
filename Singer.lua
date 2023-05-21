@@ -56,7 +56,7 @@ areas = S{
     "Aht Urhgan Whitegate",
 	"The Colosseum",
     "Tavnazian Safehold",
-    "Nashmau",
+   -- "Nashmau",
     "Selbina",
     "Mhaura",
 	"Rabao",
@@ -123,7 +123,8 @@ function review_full_dispel(player)
 		if settings.aoe.party then
 			local party = windower.ffxi.get_party()
 			for slot in get.party_slots:it() do
-				if party[slot].name == player.name and settings.aoe[slot] then
+				if settings.aoe[slot] and party[slot].name == player.name then
+					log('Watched lost: '..player.name)
 					timers['AoE'] = nil	
 				end
 			end
@@ -165,9 +166,18 @@ function review_missing_songs(player)
 		
 		end
 		if not truesong then timers[player.name][t_fullname]= nil end
-		if settings.aoe.party and not truesong then
-			timers['AoE'][t_fullname]= nil
+		if settings.aoe.party then
+			local party = windower.ffxi.get_party()
+			for slot in get.party_slots:it() do
+				if settings.aoe[slot] and party[slot].name == player.name and not truesong then
+					log('Watched lost: '..player.name)
+					timers['AoE'][t_fullname]= nil
+				end
+			end
 		end
+		--if settings.aoe.party and not truesong then
+			--timers['AoE'][t_fullname]= nil
+		--end
 	end
 	table.vprint(__party_buff_list[player.name])
 	table.vprint(timers[player.name])

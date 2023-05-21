@@ -166,8 +166,9 @@ function song_timers.buff_lost(targ_id,buff_id)
         if not song then return end
 		if settings.aoe.party then
 			local party = windower.ffxi.get_party()
+			
 			for slot in get.party_slots:it() do
-				if party[slot].name == targ.name and settings.aoe[slot] then
+				if settings.aoe[slot] and party[slot].name == targ.name then
 					song_timers.delete(song,'AoE')
 				end
 			end
@@ -196,7 +197,9 @@ function song_timers.update(targ)
 end
 
 function song_timers.delete(song,targ)
-    timers[targ][song] = nil
+	if timers[targ] and timers[targ][song] then
+		timers[targ][song] = nil
+	end
 end
 
 function song_timers.create(song,targ,dur,current_time,buffs)
