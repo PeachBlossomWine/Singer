@@ -15,6 +15,7 @@ song_buffs = {
     [207] = 'capriccio',
     [209] = 'round',
     [210] = 'gavotte',
+	[213] = 'aira',
     [214] = 'march',
     [215] = 'etude',
     [216] = 'carol',
@@ -54,6 +55,9 @@ local equip_mods = {
     [21404] = {0.3},			-- 'Linos'			-- assumes +2 songs augment
     [20629] = {0.05},           -- 'Legato Dagger',
     [20599] = {0.05},           -- 'Kali',
+	[22305] = {0.2},			-- Prime Stage 3
+	[22306] = {0.2},			-- Prime Stage 4
+	[22307] = {0.3},			-- Prime Stage 5 (Final)
     [27672] = {Paeon=0.1},      -- 'Brioso Roundlet',
     [27693] = {Paeon=0.1},      -- 'Brioso Roundlet +1',
     [23049] = {Paeon=0.1},      -- 'Brioso Roundlet +2',

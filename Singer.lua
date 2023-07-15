@@ -304,7 +304,7 @@ bard_status:show()
 
 function primary_song_check()
     bard_status:text(display_box())
-    if not settings.actions or areas:contains(res.zones[zone_id].en) then return end
+    if not settings.actions then return end --or areas:contains(res.zones[zone_id].en) then return end
 
     counter = counter + settings.interval
     if counter >= del then
