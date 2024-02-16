@@ -1,7 +1,6 @@
 return {
     ["dummy"] = L{"Puppet's Operetta","Scop's Operetta",},
     ["song"] = T{
-        ["Katiana"] = L{"Mage's Ballad III",},
     },
     ["playlist"] = T{
         ["volte"] = L{"Adventurer's Dirge","Honor March","Blade Madrigal","Sword Madrigal","Valor Minuet V",},
@@ -28,21 +27,22 @@ return {
         ["meleehaste2"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Blade Madrigal","Valor Minuet III",},
         ["clear"] = L{},
         ["w3boss"] = L{"Adventurer's Dirge","Blade Madrigal","Honor March","Valor Minuet IV","Valor Minuet V",},
+        ["alex"] = L{"Mage's Ballad III","Valor Minuet V","Honor March","Blade Madrigal",},
         ["bumba"] = L{"Valor Minuet IV","Valor Minuet V","Knight's Minne V","Honor March","Blade Madrigal",},
         ["pl"] = L{"Valor Minuet V","Valor Minuet IV","Adventurer's Dirge","Knight's Minne V","Honor March",},
         ["esortie"] = L{"Mage's Ballad III","Mage's Ballad II","Honor March","Blade Madrigal","Valor Minuet IV",},
-        ["alex"] = L{"Mage's Ballad III","Valor Minuet V","Honor March","Blade Madrigal",},
-        ["lilsam"] = L{"Blade Madrigal","Sinewy Etude","Herculean Etude","Valor Minuet V","Honor March",},
         ["cait"] = L{"Blade Madrigal","Honor March","Sentinel's Scherzo","Light Carol","Light Carol II",},
-        ["shin"] = L{"Blade Madrigal","Valor Minuet V","Sentinel's Scherzo","Honor March","Valor Minuet IV",},
-        ["mage"] = L{"Honor March","Victory March","Mage's Ballad II","Mage's Ballad III",},
-        ["xev"] = L{"Valor Minuet V","Valor Minuet IV","Wind Carol II","Sentinel's Scherzo","Honor March",},
+        ["lilsam"] = L{"Blade Madrigal","Sinewy Etude","Herculean Etude","Valor Minuet V","Honor March",},
         ["gige"] = L{"Adventurer's Dirge","Honor March","Valor Minuet IV","Valor Minuet V","Valor Minuet III",},
+        ["mage"] = L{"Honor March","Victory March","Mage's Ballad II","Mage's Ballad III",},
+        ["shin"] = L{"Blade Madrigal","Valor Minuet V","Sentinel's Scherzo","Honor March","Valor Minuet IV",},
+        ["xev"] = L{"Valor Minuet V","Valor Minuet IV","Wind Carol II","Sentinel's Scherzo","Honor March",},
         ["aris"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Knight's Minne V","Knight's Minne IV",},
         ["meleeacc"] = L{"Valor Minuet V","Blade Madrigal","Honor March","Victory March","Valor Minuet IV",},
+        ["peach"] = L{"Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI","Knight's Minne III",},
     },
     ["buffs"] = T{
     },
     ["clarion"] = L{"Valor Minuet IV",},
-    ["songs"] = L{"Valor Minuet IV","Valor Minuet V","Blade Madrigal","Honor March","Aria of Passion",},
+    ["songs"] = L{"Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI","Knight's Minne III",},
 }
