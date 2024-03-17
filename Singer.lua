@@ -22,10 +22,10 @@ default = {
     clarion=false,
     actions=false,
     pianissimo=false,
-    nightingale=true,
-    troubadour=true,
-	nitro=true,
-    recast={song={min=20,max=45},buff={min=5,max=10}},
+    nightingale=false,
+    troubadour=false,
+	nitro=false,
+    recast={song={min=40,max=70},buff={min=5,max=10}},
     active=false,
     timers=true,
     aoe={['party']=true, ['p1'] = true,['p2'] = true,['p3'] = true,['p4'] = true,['p5'] = true},
@@ -124,7 +124,7 @@ function review_full_dispel(player)
 			local party = windower.ffxi.get_party()
 			for slot in get.party_slots:it() do
 				if settings.aoe[slot] and party[slot].name == player.name then
-					log('Watched lost: '..player.name)
+					--log('Watched lost: '..player.name)
 					timers['AoE'] = nil	
 				end
 			end
@@ -170,7 +170,7 @@ function review_missing_songs(player)
 			local party = windower.ffxi.get_party()
 			for slot in get.party_slots:it() do
 				if settings.aoe[slot] and party[slot].name == player.name and not truesong then
-					log('Watched lost: '..player.name)
+					--log('Watched lost: '..player.name)
 					timers['AoE'][t_fullname]= nil
 				end
 			end
@@ -726,14 +726,28 @@ windower.register_event('addon command', function(...)
         
 		if commands[2] == 'on' then
 			settings.aoe.party = true
+			addon_message('AOE ON - Toggle all ON')
+			for i = 1,5 do
+				local proper = 'p'..i
+				settings.aoe[proper] = true
+			end
 			return
 		elseif commands[2] == 'off' then
 			settings.aoe.party = false
+			addon_message('AOE OFF')
 			return
 		end
 		
-        local _, slot = get.party_member(commands[2])
-        slot = slot or 'p'..n
+		local member
+		local slot
+		if job_list(commands[2]) then
+			member = getPlayerNameFromJob(commands[2])
+			slot = findPartyMemberSlotByName(member)
+		end
+		
+
+        --local _, slot = get.party_member(commands[2]) 
+        --slot = slot or 'p'..n
 
         if not slot then
             if command and not commands[3] then

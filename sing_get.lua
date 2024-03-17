@@ -361,7 +361,19 @@ end
 
 function get.party_member(name)
 	party = get.party()
+	table.vprint(party)
     return name and party:with('name', string.ieq+{name}) or nil
+end
+
+function findPartyMemberSlotByName(memberName)
+	local party = windower.ffxi.get_party()
+    for i = 0, 5 do -- Assuming p0 to p5 are the possible slots
+        local key = "p" .. i -- Construct the key for each slot (p0, p1, ..., p5)
+        if party[key] and party[key].name == memberName then
+            return key -- Return the key (e.g., "p0", "p1", ...) if the name matches
+        end
+    end
+    return nil -- Return nil if no matching member was found
 end
 
 return get
