@@ -361,7 +361,7 @@ end
 
 function get.party_member(name)
 	party = get.party()
-	table.vprint(party)
+	--table.vprint(party)
     return name and party:with('name', string.ieq+{name}) or nil
 end
 

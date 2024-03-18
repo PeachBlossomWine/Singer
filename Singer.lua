@@ -179,8 +179,8 @@ function review_missing_songs(player)
 			--timers['AoE'][t_fullname]= nil
 		--end
 	end
-	table.vprint(__party_buff_list[player.name])
-	table.vprint(timers[player.name])
+	--table.vprint(__party_buff_list[player.name])
+	--table.vprint(timers[player.name])
 end
 
 function set_registry(id, job_id)
