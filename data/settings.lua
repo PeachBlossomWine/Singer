@@ -32,7 +32,7 @@ return {
         ["bumba"] = L{"Valor Minuet IV","Valor Minuet V","Knight's Minne V","Honor March","Blade Madrigal",},
         ["pl"] = L{"Valor Minuet V","Valor Minuet IV","Adventurer's Dirge","Knight's Minne V","Honor March",},
         ["esortie"] = L{"Mage's Ballad III","Mage's Ballad II","Honor March","Blade Madrigal","Valor Minuet IV",},
-        ["finalsortie"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Knight's Minne V","Valor Minuet III",},
+        ["finalsortie"] = L{"Valor Minuet V","Blade Madrigal","Honor March","Army's Paeon V","Army's Paeon VI",},
         ["lilsam"] = L{"Blade Madrigal","Sinewy Etude","Herculean Etude","Valor Minuet V","Honor March",},
         ["gige"] = L{"Adventurer's Dirge","Honor March","Valor Minuet IV","Valor Minuet V","Valor Minuet III",},
         ["shin"] = L{"Blade Madrigal","Valor Minuet V","Sentinel's Scherzo","Honor March","Valor Minuet IV",},
