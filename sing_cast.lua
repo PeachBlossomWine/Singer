@@ -21,6 +21,7 @@ function cast.check_song(song_list,targ,buffs,spell_recasts,recasts,JA_WS_lock,r
     local basesongs = get.base_songs
     local ta = targ == 'AoE' and '<me>' or targ
 
+	-- Add here check for stage 5 prime to not use dummy songs.
     if basesongs > 2 and currsongs < maxsongs and #song_list > currsongs then
         for i = 1, #setting.dummy do
             local song = setting.dummy[i]
