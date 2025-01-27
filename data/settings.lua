@@ -14,7 +14,7 @@ return {
         ["arebati"] = L{"Valor Minuet IV","Valor Minuet V","Knight's Minne IV","Knight's Minne V","Honor March",},
         ["melee"] = L{"Valor Minuet V","Valor Minuet IV","Honor March","Victory March","Valor Minuet III",},
         ["mboze"] = L{"Valor Minuet V","Valor Minuet IV","Valor Minuet III","Honor March","Valor Minuet II",},
-        ["kalunga"] = L{"Valor Minuet III","Valor Minuet V","Valor Minuet IV","Honor March","Fire Carol II",},
+        ["kalunga"] = L{"Adventurer's Dirge","Valor Minuet V","Valor Minuet IV","Honor March","Valor Minuet III",},
         ["sortie"] = L{"Aria of Passion","Valor Minuet V","Blade Madrigal","Honor March","Valor Minuet IV",},
 		["eboss"] = L{"Adventurer's Dirge","Valor Minuet V","Honor March","Valor Minuet IV","Aria of Passion",},
         ["odin"] = L{"Knight's Minne V","Honor March","Valor Minuet V","Valor Minuet IV","Valor Minuet III",},
