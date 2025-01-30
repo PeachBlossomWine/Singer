@@ -16,7 +16,7 @@ song_timers = require('song_timers')
 
 default = {
     interval = 0.1,
-    delay=3,
+    delay=3.2,
     marcato='Honor March',
     soul_voice=false,
     clarion=false,

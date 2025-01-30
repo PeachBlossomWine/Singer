@@ -300,6 +300,9 @@ end
 
 function get.maxsongs(targ,buffs)
     local maxsongs = get.base_songs
+	if get.countSongs() == 5 then
+		maxsongs = maxsongs + 1	
+	end
     if buffs['clarion call'] then
         maxsongs = maxsongs + 1 
     elseif timers[targ] and maxsongs < table.length(timers[targ]) then
@@ -308,13 +311,30 @@ function get.maxsongs(targ,buffs)
     return maxsongs
 end
 
+function get.countSongs()
+    local player = windower.ffxi.get_player()
+    if not player or not player.buffs then return 0 end
+
+    local song_count = 0
+
+    for _, buff_id in ipairs(player.buffs) do
+        for spell_id, spell in pairs(res.spells) do
+            if spell.type == "BardSong" and spell.status == buff_id then
+                song_count = song_count + 1
+				break;
+            end
+        end
+    end
+    return song_count
+end
+
 function get.song_list(songs,targ,maxsongs)
     local list = {}
     local clarion = settings.clarion[targ:lower()]
     for k,v in pairs(songs) do
         list[k] = v
     end
-    if clarion and maxsongs > get.base_songs then
+    if maxsongs > get.base_songs then -- clarion and 
         list[clarion] = (list[clarion] or 0) + 1 
     end
     return list
