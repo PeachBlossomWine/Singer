@@ -300,10 +300,7 @@ end
 
 function get.maxsongs(targ,buffs)
     local maxsongs = get.base_songs
-	if get.countSongs() == 5 then
-		maxsongs = maxsongs + 1	
-	end
-    if buffs['clarion call'] then
+    if buffs['clarion call'] or get.countSongs() == 5 then
         maxsongs = maxsongs + 1 
     elseif timers[targ] and maxsongs < table.length(timers[targ]) then
         maxsongs = table.length(timers[targ])
