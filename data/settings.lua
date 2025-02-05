@@ -33,7 +33,7 @@ return {
         ["clear"] = L{},
         ["alex"] = L{"Mage's Ballad III","Valor Minuet V","Honor March","Blade Madrigal",},
         ["cait"] = L{"Blade Madrigal","Honor March","Sentinel's Scherzo","Light Carol","Light Carol II",},
-        ["xev"] = L{"Valor Minuet V","Valor Minuet IV","Wind Carol II","Sentinel's Scherzo","Honor March",},
+        ["xev"] = L{"Valor Minuet V","Honor March","Wind Carol","Sentinel's Scherzo","Valor Minuet IV"},
         ["bumba"] = L{"Valor Minuet IV","Valor Minuet V","Knight's Minne V","Honor March","Blade Madrigal",},
         ["pl"] = L{"Valor Minuet V","Valor Minuet IV","Adventurer's Dirge","Knight's Minne V","Honor March",},
         ["esortie"] = L{"Mage's Ballad III","Mage's Ballad II","Honor March","Blade Madrigal","Valor Minuet IV",},
