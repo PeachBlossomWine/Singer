@@ -47,6 +47,7 @@ return {
         ["meleeacc"] = L{"Valor Minuet V","Blade Madrigal","Honor March","Victory March","Valor Minuet IV",},
         ["peach"] = L{"Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI","Knight's Minne III",},
 		["odya"] = L{"Aria of Passion","Valor Minuet V","Blade Madrigal","Honor March","Valor Minuet IV",},
+		["recovery"] = L{"Army's Paeon VI","Mage's Ballad III","Victory March","Mage's Ballad II",},
     },
     ["buffs"] = T{
     },
