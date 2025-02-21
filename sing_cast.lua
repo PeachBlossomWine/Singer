@@ -22,11 +22,13 @@ function cast.check_song(song_list,targ,buffs,spell_recasts,recasts,JA_WS_lock,r
     local ta = targ == 'AoE' and '<me>' or targ
 
 	-- Add here check for stage 5 prime to not use dummy songs.
-    if basesongs > 2 and currsongs < maxsongs and #song_list > currsongs then
+    if not stage5_flute and basesongs > 2 and currsongs < maxsongs and #song_list > currsongs then
         for i = 1, #setting.dummy do
             local song = setting.dummy[i]
+			-- Ensure timers[targ] exists and is correctly tracking song counts
+			local song_timer_count = timers[targ] and table.length(timers[targ]) or 0
 
-            if basesongs - i >= 0 and currsongs == maxsongs - i and spell_recasts[get.song_by_name(song).id] <= 0 then
+            if basesongs - i >= 0 and currsongs == math.max(maxsongs - i, song_timer_count) and spell_recasts[get.song_by_name(song).id] <= 0 then
                 cast.MA(song, ta)
                 return true
             end

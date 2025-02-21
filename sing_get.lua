@@ -223,6 +223,8 @@ local extra_song_harp = {
     [21400] = 3, -- Blurred Harp
     [21401] = 3, -- Blurred Harp +1
     [21407] = 3, -- Terpander
+	[22307] = 4, -- Loughnashade [Stage 5]
+	[22306] = 3, -- Loughnashade [Stage 4]
     }
 
 local honor_march_horn = {
@@ -251,6 +253,7 @@ function initialize()
     get.jp_mods.marcato = jp.marcato_effect
     get.jp_mods.mult = jp.jp_spent >= 1200
     get.base_songs = 2
+	get.stage5_flute = false
     for _, bag in ipairs(equippable_bags) do
         local items = windower.ffxi.get_items(bag)
         if items.enabled then
@@ -259,6 +262,10 @@ function initialize()
                     get.base_songs = extra_song_harp[v.id]
                 elseif honor_march_horn[v.id] and #get.songs.march == 2 then
                     table.insert(get.songs.march, 1, 'Honor March')
+                end
+				-- Set global flag if we have Stage 5 Loughnashade
+                if v.id == 22307 then
+                    get.stage5_flute = true
                 end
             end
         end
