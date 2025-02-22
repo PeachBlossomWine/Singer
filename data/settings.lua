@@ -5,7 +5,7 @@ return {
     ["playlist"] = T{
         ["volte"] = L{"Adventurer's Dirge","Honor March","Blade Madrigal","Sword Madrigal","Valor Minuet V",},
         ["w3"] = L{"Adventurer's Dirge","Honor March","Blade Madrigal","Sword Madrigal","Valor Minuet V",},
-        ["ghosts"] = L{"Valor Minuet V","Honor March","Blade Madrigal","Army's Paeon VI","Army's Paeon V",},
+        ["ghosts"] = L{"Valor Minuet V","Honor March","Blade Madrigal","Valor Minuet IV","Army's Paeon VI",},
         ["xevfarm"] = L{"Valor Minuet V","Honor March","Blade Madrigal","Wind Carol II",},
         ["aman"] = L{"Mage's Ballad III","Honor March","Valor Minuet V","Victory March","Valor Minuet III",},
         ["arewar"] = L{"Valor Minuet II","Honor March","Valor Minuet IV","Valor Minuet V","Valor Minuet III",},
@@ -40,7 +40,7 @@ return {
         ["shin"] = L{"Blade Madrigal","Honor March","Valor Minuet V","Sentinel's Scherzo","Valor Minuet IV",},
         ["gige"] = L{"Adventurer's Dirge","Honor March","Valor Minuet IV","Valor Minuet V","Valor Minuet III",},
         ["lilsam"] = L{"Blade Madrigal","Honor March","Sinewy Etude","Herculean Etude","Valor Minuet V",},
-        ["fomors"] = L{"Valor Minuet V","Honor March","Knight's Minne V","Army's Paeon VI","Army's Paeon V",},
+        ["fomors"] = L{"Valor Minuet V","Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI",},
         ["aris"] = L{"Valor Minuet V","Honor March","Valor Minuet IV","Knight's Minne V","Knight's Minne IV",},
         ["meleeacc"] = L{"Valor Minuet V","Honor March","Blade Madrigal","Victory March","Valor Minuet IV",},
         ["peach"] = L{"Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI","Knight's Minne III",},
