@@ -123,7 +123,7 @@ function review_full_dispel(player)
 		if settings.aoe.party then
 			local party = windower.ffxi.get_party()
 			for slot in get.party_slots:it() do
-				if settings.aoe[slot] and party[slot].name == player.name then
+				if settings.aoe[slot] and party[slot] and party[slot].name == player.name then
 					--log('Watched lost: '..player.name)
 					timers['AoE'] = nil	
 				end
