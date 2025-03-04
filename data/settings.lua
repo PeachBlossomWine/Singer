@@ -40,7 +40,7 @@ return {
         ["shin"] = L{"Blade Madrigal","Honor March","Valor Minuet V","Sentinel's Scherzo","Valor Minuet IV",},
         ["gige"] = L{"Adventurer's Dirge","Honor March","Valor Minuet IV","Valor Minuet V","Valor Minuet III",},
         ["lilsam"] = L{"Blade Madrigal","Honor March","Sinewy Etude","Herculean Etude","Valor Minuet V",},
-        ["fomors"] = L{"Valor Minuet V","Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI",},
+        ["fomors"] = L{"Valor Minuet V","Honor March","Knight's Minne V","Knight's Minne IV","Valor Minuet IV",},
         ["aris"] = L{"Valor Minuet V","Honor March","Valor Minuet IV","Knight's Minne V","Knight's Minne IV",},
         ["meleeacc"] = L{"Valor Minuet V","Honor March","Blade Madrigal","Victory March","Valor Minuet IV",},
         ["peach"] = L{"Honor March","Knight's Minne V","Knight's Minne IV","Army's Paeon VI","Knight's Minne III",},
